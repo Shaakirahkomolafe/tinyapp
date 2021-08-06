@@ -12,28 +12,31 @@
       </div>
     </div> 
   </div>
- 
-  <% if(locals.username){ %>
-    
+ <% console.log(locals) %>
+  <% if (!locals.user) {%>
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/register"> Register</a>  
+      </div>
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/login"> Login</a>  
+        </div>
 
+   
+
+  <% } else { %>  
+    Logged in as <%= user.email %>
+    
     <form method="POST" action="/logout" class="form-inline my-2 my-lg-0" >
       <button class="btn btn-success my-2 my-sm-0" type="submit">Logout</button>
       
-    </form>   
+     
 
-  <% } else{ %>  
+    </form>
     
-    <form method="POST" action="/login" class="form-inline my-2 my-lg-0" >
-      <input class="form-control mr-sm-2" type="text" placeholder="username" name = "username" aria-label="Username">
-      <button class="btn btn-success my-2 my-sm-0" type="submit">Login</button>
+    
       
-    </form>   
 
- <% } %>
-
-
-  
-
+    <% } %>
   </nav>
 
 </header>
