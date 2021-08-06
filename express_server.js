@@ -3,6 +3,7 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
@@ -74,16 +75,10 @@ app.get("/urls",(req, res) => {
   const userId = req.cookies.userId;
   if (!userId) {
     res.status(403).send('You have to login or register ');
-    // res.render('partials/_header');
   }
-  // let urls = {};
-  // for (let url in urlDatabase) {
-  //   urls[url] = urlDatabase[url].longURL;
-  // }
   const urls = urlsForUser(userId);
  
   const templateVars = {
-   
     urls,
     user: users[userId]
   };
@@ -158,7 +153,7 @@ app.post("/login", (req, res) => {
   // i want to go through the database(users) to go through the keys to check if this email value and password value exists
   for (let user in users) {
   
-    if (users[user].email === userEmail && users[user].password === userPassword) {
+    if (users[user].email === userEmail && bcrypt.compareSync(users[user].password,  userPassword)) {
       res.cookie('userId', user);
       res.redirect('/urls');
     }
@@ -195,18 +190,21 @@ app.get("/register", (req,res) => {
 });
 
 app.post("/register", (req, res) => {
+  const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password,10);
+
   for (let userId in users) {
     if (users[userId].email === req.body.email) {
       return res.sendStatus(400);
     }
   }
-  if (req.body.email === '' || req.body.password === '') {
-    return res.sendStatus(400);
+  if (req.body.email === '' || password === '') {
+    return res.status(400).send('Please type in a valid email and password');
   }
   const userObject = {
     id: getRandomID(),
     email: req.body.email,
-    password: req.body.password
+    password: hashedPassword
   };
   users[userObject.id] = userObject;
   res.cookie('userId', userObject.id);
