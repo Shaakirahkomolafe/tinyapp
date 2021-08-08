@@ -13,6 +13,8 @@ app.use(cookieSession({
 
 app.set("view engine", "ejs");
 
+
+/* . database for url */
 const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
@@ -24,6 +26,7 @@ const urlDatabase = {
   }
   
 };
+/* database for users */
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -37,6 +40,7 @@ const users = {
   }
 };
 
+/* urls for each user */
 const urlsForUser = function(id) {
   let results = {};
   const keys = Object.keys(urlDatabase);
@@ -49,9 +53,15 @@ const urlsForUser = function(id) {
   }
   return results;
 };
+/* homepage, if user is logged in, redirect to urls page, if not, redirect to login or register */
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const userId = req.session['userId'];
+  if (!userId) {
+    res.redirect('/login');
+  }
+
+  res.redirect('/urls');
 });
 
 app.get('/urls.json', (req,res) => {
@@ -66,11 +76,12 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
+/* Urls page, if user is logged in, show them their urls and have access to create or edit, if not ask to login or register*/
 app.get("/urls",(req, res) => {
   const userId = req.session['userId'];
   if (!userId) {
-    res.status(403).send('You have to login or register ');
+    // res.status(403).send('You have to login or register ');
+    res.redirect('/login');
   }
   const urls = urlsForUser(userId);
   const templateVars = {
@@ -149,7 +160,7 @@ app.get("/login", (req, res) => {
 
 app.post("/logout", (req,res) => {
   const userId = req.session['userId'];
-  req.session = null;
+  req.session['userId'] = null;
   res.redirect("/urls");
 });
 
