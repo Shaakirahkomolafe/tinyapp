@@ -110,22 +110,17 @@ app.get("/urls/new", (req,res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session['userId'];
-  if (!userId) {
-    return res.redirect('/login');
-  }
   let usersURL = urlDatabase[req.params.shortURL];
-  const templateVars = { shortURL: req.params.shortURL,
+  const templateVars = {
+    shortURL: req.params.shortURL,
     longURL: usersURL.longURL,
     user: users[usersURL.userID]
   };
+
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const userId = req.session['userId'];
-  if (!userId) {
-    return res.redirect('/login');
-  }
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].longURL;
   return res.redirect(longURL);
@@ -141,10 +136,17 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 
 app.post("/urls/:id", (req, res) => {
+  console.log('+++++++', req.session);
+  console.log('>>>>>>>', users);
+  const userId = req.session['userId'];
   let newURL = req.body.editURL;
   let shortURL = req.params['id'];
   urlDatabase[shortURL].longURL = newURL;
-  res.redirect('/urls');
+  const ownerID = urlDatabase[shortURL].userID;
+  if (userId !== ownerID) {
+    return res.status(403).send('Forbidden operation');
+  }
+  return res.redirect('/urls');
 });
 
 /* if the  user exists in the database, succesfully login, if  information is incorrect, ask to enter correct one*/
