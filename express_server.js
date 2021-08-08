@@ -11,6 +11,7 @@ app.use(cookieSession({
 }));
 
 app.set("view engine", "ejs");
+
 /*  database for url created*/
 const urlDatabase = {
   b2xVn2: {
@@ -23,6 +24,7 @@ const urlDatabase = {
   }
   
 };
+
 /* database for users */
 const users = {
   "userRandomID": {
@@ -36,6 +38,7 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
 /* to make sure that the urls displayed is for  for each user */
 const urlsForUser = function(id) {
   let results = {};
@@ -48,6 +51,7 @@ const urlsForUser = function(id) {
   }
   return results;
 };
+
 /* homepage, if user is logged in, redirect to urls page, if not, redirect to login or register */
 app.get("/", (req, res) => {
   const userId = req.session['userId'];
@@ -56,15 +60,19 @@ app.get("/", (req, res) => {
   }
   return res.redirect('/urls');
 });
+
 app.get('/urls.json', (req,res) => {
   res.json(urlDatabase);
 });
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b> World </b></body></html>\n");
 });
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
 /* Urls page, if user is logged in, show them their urls and have access to create or edit, if not ask to login or register*/
 app.get("/urls",(req, res) => {
   const userId = req.session['userId'];
@@ -78,6 +86,7 @@ app.get("/urls",(req, res) => {
   };
   res.render("urls_index", templateVars);
 });
+
 /* redirects to newly created shortUrl*/
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
@@ -86,6 +95,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {longURL, userID};
   return res.redirect(`/urls/${shortURL}`);
 });
+
 /* new  urls display*/
 app.get("/urls/new", (req,res) => {
   const userId = req.session['userId'];
@@ -97,6 +107,7 @@ app.get("/urls/new", (req,res) => {
   }
   res.render("urls_new", templateVars);
 });
+
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session['userId'];
   if (!userId) {
@@ -109,6 +120,7 @@ app.get("/urls/:shortURL", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
+
 app.get("/u/:shortURL", (req, res) => {
   const userId = req.session['userId'];
   if (!userId) {
@@ -118,18 +130,23 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[shortURL].longURL;
   return res.redirect(longURL);
 });
+
+
 /* deletes url*/
 app.post('/urls/:shortURL/delete', (req, res) => {
   let shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   return res.redirect('/urls');
 });
+
+
 app.post("/urls/:id", (req, res) => {
   let newURL = req.body.editURL;
   let shortURL = req.params['id'];
   urlDatabase[shortURL].longURL = newURL;
   res.redirect('/urls');
 });
+
 /* if the  user exists in the database, succesfully login, if  information is incorrect, ask to enter correct one*/
 app.post("/login", (req, res) => {
   const userEmail = req.body.email;
@@ -142,6 +159,7 @@ app.post("/login", (req, res) => {
     res.status(403).send('Email or password incorrect');
   }
 });
+
 /* getting the login page to render */
 app.get("/login", (req, res) => {
   const userId = req.session['userId'];
@@ -150,11 +168,13 @@ app.get("/login", (req, res) => {
   };
   res.render('login', templateVars);
 });
+
 /* logout successfully and clear session cookies */
 app.post("/logout", (req,res) => {
   req.session = null;
   return res.redirect("/urls");
 });
+
 /* registration, if a user succesfully registers redirect to urls */
 app.get("/register", (req,res) => {
   const id = req.session['userId'];
@@ -164,6 +184,7 @@ app.get("/register", (req,res) => {
   }
   res.render('register', user);
 });
+
 /* checks registration to see if user already exists or not, if yes, ask use another email, if no, add to database */
 app.post("/register", (req, res) => {
   const password = req.body.password;
