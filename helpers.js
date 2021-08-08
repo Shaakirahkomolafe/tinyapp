@@ -33,11 +33,9 @@ const addNewUser = function(email, password, users) {
     password: bcrypt.hashSync(password, 10)
   };
   users[id] = newUser;
+  // return {users, newUser};
   return id;
 };
-
-
-
 
 module.exports = { getUserByEmail ,
   generateRandomString,

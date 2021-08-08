@@ -12,7 +12,6 @@
       </div>
     </div> 
   </div>
- <% console.log(locals) %>
   <% if (!locals.user) {%>
     <div class="navbar-nav">
       <a class="nav-item nav-link" href="/register"> Register</a>  
@@ -20,16 +19,13 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/login"> Login</a>  
         </div>
-
-   
-
   <% } else { %>  
     Logged in as <%= user.email %>
     
     <form method="POST" action="/logout" class="form-inline my-2 my-lg-0" >
-      <button class="btn btn-success my-2 my-sm-0" type="submit">Logout</button>
+      <button class="btn btn-success my-2 my-sm-0" type= "submit"> Logout</button>
       
-     
+    
 
     </form>
     
