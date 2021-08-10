@@ -109,20 +109,24 @@ app.get("/urls/new", (req,res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const userId = req.session['userId'];
   let usersURL = urlDatabase[req.params.shortURL];
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: usersURL.longURL,
-    user: users[usersURL.userID]
-  };
+  if (!req.session['userId'] || usersURL.userID !== req.session['userId']) {
+    res.status(403).send('Not authorized');
 
-  res.render("urls_show", templateVars);
+  } else {
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: usersURL.longURL,
+      user: users[usersURL.userID]
+    };
+    res.render("urls_show", templateVars);
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].longURL;
+
   return res.redirect(longURL);
 });
 
@@ -136,8 +140,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 
 app.post("/urls/:id", (req, res) => {
-  console.log('+++++++', req.session);
-  console.log('>>>>>>>', users);
   const userId = req.session['userId'];
   let newURL = req.body.editURL;
   let shortURL = req.params['id'];
